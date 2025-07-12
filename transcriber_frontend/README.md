@@ -43,6 +43,7 @@ python transcriber_frontend/websocket_server.py
 Don't open the HTML file directly — serve it using an HTTP server:
 
 cd transcriber_frontend
+
 python -m http.server 5500
 
 Then open: http://localhost:5500
