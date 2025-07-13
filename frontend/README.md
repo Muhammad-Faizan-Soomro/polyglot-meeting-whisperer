@@ -1,186 +1,233 @@
-# Polyglot Meeting Whisperer 🌐
+# 🌐 Polyglot Meeting Whisperer - Frontendn
 
-A beautiful, modern React application for real-time meeting transcription and translation. Capture conversations in multiple languages, get instant translations, and leverage AI-powered agents with an elegant glassmorphism UI.
+Polyglot Meeting Whisperer is a real-time meeting assistant that captures microphone audio in chunks, transcribes it, translates it, summarizes it, generates questions and extracts & explains buzz keywords — all using AI agents.
 
 ## ✨ Features
 
-- **Real-time Audio Transcription** - Convert speech to text instantly
-- **Multi-language Translation** - Translate conversations in real-time
-- **Speaker Identification** - Automatically detect and label different speakers
-- **AI-Powered Agents** - Utilize specialized agents for audio input, transcription, translation, question generation, summarization, topic extraction, keyword explanation, and output orchestration
-- **Beautiful Glass UI** - Modern glassmorphism design with smooth animations
-- **Session Analytics** - Track word count, speaker count, and session duration
-- **Export Functionality** - Save transcripts and translations as JSON files
-- **Responsive Design** - Works perfectly on desktop and mobile devices
+- **Real-time Transcription**
+- **Live Translation** to multiple languages
+- **AI-Powered Insights**:
+  - Automatic question generation
+  - Dynamic meeting summarization
+  - Topic extraction
+  - Keyword explanations
+- **Session Analytics**:
+  - Word count tracking
+  - Speaker statistics
+  - Session duration timer
+- **Export Capabilities** (JSON format)
+- **WebSocket Integration** for real-time communication
+- **Audio Chunk Processing** (5-second intervals)
+- **Configurable Language Settings**
 
-## 🚀 Technologies Used
+## 🧰 Technology Stack
 
-- **React 18** - Modern React with Hooks
-- **Web Audio API** - For audio recording and processing
-- **CSS3/Tailwind CSS** - Custom styling with glassmorphism effects
-- **Lucide React** - Beautiful icons
-- **ES6+** - Modern JavaScript features
+- **Frontend**: 
+  - React 18
+  - Tailwind CSS
+  - Lucide React (icons)
+- **Real-time Communication**: WebSocket API
+- **Audio Processing**: MediaRecorder API
+- **State Management**: React Hooks (useState, useEffect, useRef)
+- **Architecture**: Component-based UI with custom hooks
 
 ## 📁 Project Structure
 
 ```
-polyglot-meeting-whisperer/
-├── public/
-│   ├── index.html
-├── src/
-│   ├── components/
-│   │   ├── Dashboard.js
-│   │   ├── TranscriptCard.js
-│   │   ├── SettingsModal.js
-│   │   ├── ControlButtons.js
-│   │   ├── Header.js
-│   │   ├── StatsPanel.js
-│   │   └── AgentCard.js
-│   ├── hooks/
-│   │   └── useAudioRecording.js
-│   ├── utils/
-│   │   └── translator.js
-│   ├── styles/
-│   │   └── globals.css
-│   ├── App.js
-│   ├── App.css
-│   └── index.js
-├── package.json
-└── README.md
+src/
+├── App.js               # Main application component
+├── index.js             # Entry point
+├── hooks/
+│   └── useAudioRecording.js # Audio processing logic
+├── utils/
+│   └── translator.js    # Language utilities
+├── components/
+│   ├── AgentCard.js     # Agent status component
+│   ├── ControlButtons.js# Recording controls
+│   ├── Header.js        # Application header
+│   ├── KeywordCard.js   # Keyword explanations
+│   ├── QuestionCard.js  # Generated questions
+│   ├── SettingsModal.js # Language settings
+│   ├── StatsPanel.js    # Meeting statistics
+│   ├── SummaryCard.js   # Meeting summary
+│   ├── TopicCard.js     # Extracted topics
+│   ├── TranscriptCard.js# Original transcript
+│   └── TranslatedCard.js# Translated transcript
+└── styles/
+    └── globals.css      # Global styles
 ```
 
-## 🛠️ Installation
+## 🚀 Getting Started
 
+### Prerequisites
+- Node.js v16+
+- npm v8+
+- WebSocket server running at `ws://localhost:8765`
+- Browser with MediaRecorder API support
+
+### Installation
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/polyglot-meeting-whisperer.git
-   cd polyglot-meeting-whisperer
-   ```
+```bash
+git clone https://github.com/Muhammad-Faizan-Soomro/polyglot-meeting-whisperer.git
+cd frontend
+```
 
 2. Install dependencies:
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
 3. Start the development server:
-   ```bash
-   npm start
-   ```
+```bash
+npm start
+```
 
-4. Open your browser and navigate to `http://localhost:3000`
+4. Open in your browser:
+```
+http://localhost:3000
+```
 
-## 📦 Dependencies
+## 🎮 Usage
 
-```json
-{
-  "react": "^18.2.0",
-  "react-dom": "^18.2.0",
-  "lucide-react": "^0.263.1"
+1. **Start Recording**:
+   - Click the microphone button to begin capturing audio
+   - Real-time transcription will appear in the left panel
+   - Audio is processed in 5-second chunks
+
+2. **View Translations**:
+   - Translated text automatically appears in the right panel
+   - Modify languages in Settings
+
+3. **Access AI Insights**:
+   - Generated questions appear in the Questions panel
+   - Meeting summary updates dynamically
+   - Topics and keywords populate as conversation progresses
+
+4. **Export Data**:
+   - Click Export to save meeting data as JSON
+   - Includes transcripts, translations, and all AI insights
+
+5. **Adjust Settings**:
+   - Change default language through Settings modal
+
+## 🧩 Key Components
+
+### `useAudioRecording` Hook
+Handles all audio processing logic:
+
+```javascript
+const useAudioRecording = ({
+  onTranscriptUpdate,
+  onTranslatedUpdate,
+  onSummaryUpdate,
+  onQuestionsUpdate,
+  onKeywordsUpdate,
+  onSessionStart,
+  language,
+}) => {
+  // Hook implementation
+};
+```
+
+**Features**:
+- WebSocket connection management
+- Audio capture via MediaRecorder API
+- 5-second audio chunk processing
+- Real-time message handling:
+  - Transcript updates
+  - Translated content
+  - Meeting summaries
+  - Generated questions
+  - Keyword explanations
+- Configurable language support
+
+**Message Types Handled**:
+```javascript
+switch (message.type) {
+  case "transcript": // Updates original transcript
+  case "translated": // Updates translated content
+  case "summary":    // Processes meeting summary
+  case "questions":  // Handles generated questions
+  case "keywords":   // Processes keyword explanations
 }
 ```
 
-## 🎯 Usage
-
-### Starting a Recording Session
-1. Click the "Start Recording" button to begin capturing audio
-2. The app will request microphone permissions
-3. Speak naturally - the app will transcribe and translate in real-time
-4. View live statistics in the dashboard and agent outputs
-
-### Language Selection
-1. Choose your original language from the language selector
-2. Select your target translation language
-3. The app supports English, Spanish, French, German, and Chinese
-
-### Exporting Transcripts
-1. Click the "Export" button to download your session data
-2. The exported file includes original transcript, translations, and session metadata
-3. Files are saved in JSON format for easy processing
-
-### AI Agents
-- **Audio Input Listener**: Captures and processes live audio with noise filtering
-- **Transcriber Agent**: Converts speech to text with speaker identification
-- **Translator Agent**: Provides real-time translation with contextual understanding
-- **Question Generator Agent**: Generates follow-up questions for engagement
-- **Summarizer Agent**: Produces concise meeting summaries
-- **Topic Extractor Agent**: Identifies and categorizes discussion topics
-- **Keyword Explanation Agent**: Explains technical terms
-- **Output Orchestrator**: Manages all agent outputs for a seamless experience
-
-### Settings
-1. Click the "Settings" button to open the configuration modal
-2. Adjust default language preferences
-3. Configure audio input settings
-
-## 🎨 Design Philosophy
-
-The app features a modern **glassmorphism** design with:
-- Translucent glass-like cards with backdrop blur effects
-- Vibrant gradient backgrounds
-- Smooth animations and transitions
-- Responsive layout that works on all devices
-- Intuitive user interface with clear visual hierarchy
-
-## 🔧 Development
-
-### Available Scripts
-
-- `npm start` - Runs the app in development mode
-- `npm test` - Launches the test runner
-- `npm run build` - Builds the app for production
-- `npm run eject` - Ejects from Create React App (irreversible)
-
-### Browser Support
-
-- Chrome (recommended for best Web Audio API support)
-- Firefox
-- Safari
-- Edge
-
-### Audio Recording
-
-The app uses the Web Audio API for audio capture. For production use, you would integrate with services like:
-- Google Cloud Speech-to-Text
-- Azure Speech Services
-- AWS Transcribe
-- OpenAI Whisper
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Icons by [Lucide](https://lucide.dev/)
-- Glassmorphism design inspiration from modern UI trends
-- Web Audio API documentation and examples
-
-## 🐛 Known Issues
-
-- Audio recording requires HTTPS in production
-- Some browsers may have different Web Audio API implementations
-- Translation is currently mock data - integrate with real translation APIs for production
-
-## 🚀 Future Enhancements
-
-- [ ] Integration with real speech-to-text APIs
-- [ ] Real-time translation API integration
-- [ ] WebRTC for multi-participant meetings
-- [ ] Advanced audio processing and noise reduction
-- [ ] Meeting notes and summary generation
-- [ ] User authentication and session management
-- [ ] Cloud storage for transcripts
-- [ ] Advanced analytics and reporting
-<<<<<<< HEAD
+### Agent System
+6 specialized agents working in concert:
+```js
+const agents = [
+  { icon: "📝", title: "Transcriber Agent", ... },
+  { icon: "🌍", title: "Translator Agent", ... },
+  { icon: "❓", title: "Question Generator Agent", ... },
+  { icon: "📋", title: "Summarizer Agent", ... },
+  { icon: "🏷", title: "Topic Extractor Agent", ... },
+  { icon: "💡", title: "Keyword Explanation Agent", ... },
+];
 ```
-=======
+
+### Data Export
+Generates comprehensive JSON output with:
+```json
+{
+  "session": {
+    "duration": "25:43",
+    "timestamp": "2023-07-14T12:34:56.789Z",
+    "summary": {
+      "wordCount": 1245,
+      "speakers": 3,
+      "avgWords": 415
+    }
+  },
+  "original": [
+    {"speaker": "John", "text": "Hello team!", "time": "12:34:56"}
+  ],
+  "translated": [
+    {"speaker": "", "text": "¡Hola equipo!", "time": "12:34:57"}
+  ],
+  "questions": [
+    {"text": "What are our next steps?"}
+  ],
+  "summary": "Discussed project timeline...",
+  "topics": ["Project Planning", "Timeline"],
+  "keywords": [
+    {"term": "NLP", "explanation": "Natural Language Processing"}
+  ]
+}
 ```
->>>>>>> c241bbbf0afc6ee938803974dedef1f40472cdae
+
+## 📚 Component Documentation
+
+### Core UI Components
+
+| Component | Props | Description | Features |
+|-----------|-------|-------------|----------|
+| **useAudioRecording** | Various callbacks, `language` | Audio processing hook | • WebSocket management<br>• MediaRecorder integration<br>• Real-time data processing |
+| **SettingsModal** | `isOpen`, `onClose`, `language`, `onLanguageChange` | Language configuration | • Dropdown selector<br>• Glassmorphism UI |
+| **StatsPanel** | `wordCount`, `speakerCount`, `avgWords`, `sessionDuration` | Analytics dashboard | • Gradient counters<br>• Responsive layout |
+| **SummaryCard** | `summary`, `isLoading` | Meeting summary display | • Loading states<br>• Clean presentation |
+| **TopicCard** | `topics`, `isLoading` | Extracted topics panel | • Numbered list<br>• Auto-update |
+| **TranscriptCard** | `transcript`, `isLoading` | Original transcript | • Speaker identification<br>• Timestamps |
+| **TranslatedCard** | `transcript`, `isLoading` | Translation output | • Bilingual support<br>• Auto-scroll |
+
+### Data Flow
+```mermaid
+graph LR
+A[Microphone] --> B[useAudioRecording]
+B --> C[WebSocket Server]
+C --> D[Transcriber Agent]
+D --> E[Original Transcript]
+C --> F[Translator Agent]
+F --> G[Translated Content]
+C --> H[Question Generator]
+H --> I[Questions Panel]
+C --> J[Summarizer Agent]
+J --> K[Summary Panel]
+C --> L[Topic Extractor]
+L --> M[Topics Panel]
+C --> N[Keyword Agent]
+N --> O[Keywords Panel]
+```
+
+## 📜 License
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+```
