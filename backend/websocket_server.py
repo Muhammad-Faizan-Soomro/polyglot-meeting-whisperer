@@ -7,6 +7,7 @@ from agents.transcribe_agent import TranscribeAgent
 from agents.translate_agent import TranslateAgent 
 from agents.summarizer_agent import SummarizerAgent
 from agents.question_generator_agent import QuestionGeneratorAgent
+from agents.keyword_explainer_agent import KeywordExplainerAgent
 
 PORT = 8765
 QUEUE = asyncio.Queue()
@@ -16,6 +17,7 @@ transcribe_agent = TranscribeAgent()
 translate_agent = TranslateAgent()
 summarizer_agent = SummarizerAgent()
 question_generator_agent = QuestionGeneratorAgent()
+keyword_agent = KeywordExplainerAgent()
 
 async def transcribe_worker():
     while True:
@@ -23,16 +25,21 @@ async def transcribe_worker():
         try:
             transcript = transcribe_agent.run(file_path)
             if transcript:
-                # print("📝 Transcript:", transcript)
 
                 # Translate the transcript
-                translated = translate_agent.run(transcript, target_language="Spanish")
-                # print("🌍 Translated:", translated)
+                translated = translate_agent.run(transcript, target_language="Roman Urdu")
 
-                # Save both to file
+                explanations = keyword_agent.run(transcript)
+
                 with open("transcripts.txt", "a", encoding="utf-8") as f:
                     f.write("Transcript: " + transcript + "\n")
-                    f.write("Translation: " + translated + "\n\n")
+                    f.write("Translation: " + translated + "\n")
+                    if explanations:
+                        f.write("Keywords Explained:\n")
+                        for item in explanations:
+                            f.write(f"- {item['keyword']}: {item['definition']}\n")
+                        f.write("\n")
+                    f.write("\n")
 
                 
                 # Add to summary agent
