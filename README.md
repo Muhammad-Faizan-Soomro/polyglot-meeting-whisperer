@@ -27,7 +27,7 @@ graph LR
 | Gabriel Calderon       | Project Lead       |
 | Wajeeha Ghazi          | UI-UX Designer     |
 | Khadeeja               | Documentation Lead |
-| Muhammad Faizan Soomro | Full Stack         |
+| Muhammad Faizan Soomro | Full Stack + AI Dev|
 | Muhammad Jasim         | AI Specialist      |
 | Muhammad Abdullah Bilal| Frontend Developer |
 | Fawad Malik            | AI Specialist      |
