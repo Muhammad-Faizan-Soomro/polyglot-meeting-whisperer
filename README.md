@@ -23,7 +23,7 @@ graph LR
 ## 👥 Team Members
 | Name                   | Role               |
 |------------------------|--------------------|
-| Abbas Al-Kaisi         | Full Stack         |
+| Abbas Al-Kaisi         | AI + Full Stack Lead |
 | Gabriel Calderon       | Project Lead       |
 | Wajeeha Ghazi          | UI-UX Designer     |
 | Khadeeja               | Documentation Lead |
