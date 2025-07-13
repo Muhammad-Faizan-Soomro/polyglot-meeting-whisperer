@@ -1,0 +1,160 @@
+# polyglot-meeting-whisperer/docker-compose.yml
+networks:
+  local-genai-network:
+    driver: bridge
+
+services:
+  frontend:
+    container_name: genai-frontend
+    build:
+      context: ./genai-agentos/frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    env_file: ./.env
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=http://backend:8000
+      - VITE_WS_URL=ws://backend:8000
+    networks:
+     - local-genai-network
+    restart: unless-stopped
+
+  router:
+    container_name: genai-router
+    build:
+      context: ./genai-agentos/router
+    ports:
+      - "8080:8080"
+    env_file: ./.env
+    networks:
+     - local-genai-network
+    restart: unless-stopped
+
+  master-agent:
+    container_name: genai-master-agent
+    build:
+      context: ./genai-agentos/master-agent
+    env_file: ./.env
+    networks:
+     - local-genai-network
+    restart: unless-stopped
+    depends_on:
+      - router
+
+  backend:
+    container_name: genai-backend
+    build:
+      context: ./genai-agentos/backend
+    ports:
+      - "8000:8000"
+    env_file: ./.env
+    networks:
+     - local-genai-network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - router
+      - migration_svc
+    volumes:
+      - shared-files-volume:${DEFAULT_FILES_FOLDER_NAME:-/files}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  postgres:
+    container_name: genai-postgres
+    build:
+      context: ./genai-agentos/backend/scripts
+      dockerfile: ./Dockerfile.postgres
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-postgres}
+    networks:
+     - local-genai-network
+    restart: unless-stopped
+    volumes:
+        - ./genai-agentos/backend/scripts/postgres.conf:/etc/postgresql/postgresql.conf
+        - postgres-volume:/var/lib/postgresql/data
+  redis:
+    container_name: genai-redis
+    image: redis:7
+    ports:
+      - "6379:6379"
+    networks:
+     - local-genai-network
+    volumes:
+      - redis-data:/data
+
+  migration_svc:
+    container_name: genai-migration-svc
+    build:
+      context: ./genai-agentos/backend
+    depends_on:
+      - postgres
+    env_file:
+      - ./.env
+    networks:
+     - local-genai-network
+    restart: on-failure
+    command: ["alembic", "upgrade", "head"]
+
+  celery:
+    container_name: genai-celery-worker
+    build: 
+      context: ./genai-agentos/backend
+    command: celery -A src.celery.celery_app worker --loglevel=debug
+    networks:
+     - local-genai-network
+    depends_on:
+      - redis
+
+  celery-beat:
+    container_name: genai-celery-beat
+    build: 
+      context: ./genai-agentos/backend
+    command: celery -A src.celery.celery_app beat --loglevel=debug
+    networks:
+     - local-genai-network
+    depends_on:
+      - redis
+  polyglot-backend: 
+    build:
+      context: ./polyglot-backend 
+      dockerfile: Dockerfile
+    container_name: polyglot-backend
+    ports:
+      - "8008:8008" 
+    env_file:
+      - ./.env 
+    networks:
+      - local-genai-network 
+    restart: unless-stopped
+    depends_on:
+      - router 
+      - backend       
+
+  polyglot-frontend:
+    build:
+      context: ./polyglot-frontend 
+      dockerfile: Dockerfile
+    container_name: polyglot-frontend
+    ports:
+      - "7860:7860" 
+    environment:      
+      - WEBSOCKET_URL=ws://localhost:8008/ws
+    env_file:
+      - ./.env 
+    networks:
+      - local-genai-network 
+    depends_on:
+      - polyglot-backend 
+    restart: unless-stopped
+
+volumes:
+  postgres-volume:
+  shared-files-volume:
+  redis-data:
