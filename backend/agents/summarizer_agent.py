@@ -32,10 +32,26 @@ class SummarizerAgent:
 
             try:
                 prompt = (
-                f"""You are a helpful assistant. Summarize the following transcript chunk into clear, concise short paragraph and don't miss any important detail\n\n
-                TRANSCRIPT: {input_text}\n\n
-                ONLY return 2 summaries: 1 in original input language and 1 in {target_language},
-                correct the summaries if they don't make sense due to bad recording."""
+                    f"""You are a helpful assistant. Analyze the following transcript chunk and do the following:
+
+                1. Generate a clear, concise summary in the original language without missing any important detail.
+                2. Translate that summary into {target_language}.
+                3. Identify and return a brief topic/title that best represents the main subject of this transcript.
+
+                TRANSCRIPT:
+                {input_text}
+
+                Please return your response in the following format:
+
+                - Summary (Original):
+                <original summary>
+
+                - Summary ({target_language}):
+                <translated summary>
+
+                - Topic:
+                <topic in a few words>
+                """
                 )
 
                 print(f"🧠 Summarizing round {self.summary_round}...")
