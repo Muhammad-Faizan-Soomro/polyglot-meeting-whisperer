@@ -3,6 +3,10 @@ import { useState, useRef, useEffect } from "react";
 
 const useAudioRecording = ({
   onTranscriptUpdate,
+  onTranslatedUpdate,
+  onSummaryUpdate,
+  onQuestionsUpdate,
+  onKeywordsUpdate,
   onSessionStart,
   language,
 }) => {
@@ -13,7 +17,7 @@ const useAudioRecording = ({
   const intervalRef = useRef(null);
 
   useEffect(() => {
-    // Connect WebSocket on component mount
+    // Connect WebSocket on mount
     socketRef.current = new WebSocket("ws://localhost:8765");
 
     socketRef.current.onopen = () => {
@@ -23,13 +27,53 @@ const useAudioRecording = ({
     socketRef.current.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
-        if (Array.isArray(message)) {
-          onTranscriptUpdate(message);
-        } else {
-          console.warn("Unexpected WebSocket message:", message);
+
+        switch (message.type) {
+          case "transcript":
+            onTranscriptUpdate?.([
+              {
+                speaker: "Speaker",
+                text: message.data,
+                time: new Date().toLocaleTimeString(),
+              },
+            ]);
+            break;
+
+          case "translated":
+            onTranslatedUpdate?.(message.data);
+            break;
+
+          case "summary":
+            const rawSummary = message.data;
+            const topicMatch = rawSummary.match(/- Topic:\s*(.+)/);
+            const topic = topicMatch ? topicMatch[1].trim() : null;
+
+            // Extract clean summary (strip topic line)
+            const cleanSummary = rawSummary.split("- Topic:")[0].trim();
+
+            if (onSummaryUpdate) {
+              onSummaryUpdate(cleanSummary, topic);
+            }
+            break;
+
+          case "questions":
+            onQuestionsUpdate?.(message.data.map((q) => ({ text: q })));
+            break;
+
+          case "keywords":
+            onKeywordsUpdate?.(
+              message.data.map((kw) => ({
+                term: kw.keyword,
+                explanation: kw.definition,
+              }))
+            );
+            break;
+
+          default:
+            console.warn("⚠️ Unknown message type:", message.type);
         }
       } catch (err) {
-        console.error("Failed to parse message:", err);
+        console.error("❌ Failed to parse WebSocket message:", err);
       }
     };
 
@@ -64,7 +108,7 @@ const useAudioRecording = ({
     recorder.ondataavailable = (event) => {
       if (
         event.data.size > 0 &&
-        socketRef.current.readyState === WebSocket.OPEN
+        socketRef.current?.readyState === WebSocket.OPEN
       ) {
         socketRef.current.send(event.data);
         console.log("📤 Sent audio chunk:", event.data.size);
@@ -77,7 +121,7 @@ const useAudioRecording = ({
       if (recorder.state !== "inactive") {
         recorder.stop();
       }
-    }, 5000); // 5-second chunks
+    }, 5000); // 5 seconds per chunk
   };
 
   const startRecording = async () => {
@@ -86,11 +130,11 @@ const useAudioRecording = ({
       return;
     }
 
-    // 🟡 Send config before audio starts
+    // 🛠️ Send config including language
     socketRef.current.send(
       JSON.stringify({
         type: "config",
-        language, // <-- pass it here
+        language,
       })
     );
 
@@ -101,7 +145,7 @@ const useAudioRecording = ({
 
       if (onSessionStart) onSessionStart();
 
-      recordChunk(); // Start first chunk immediately
+      recordChunk(); // Send first chunk
 
       intervalRef.current = setInterval(() => {
         if (isRecording) {
@@ -112,7 +156,7 @@ const useAudioRecording = ({
       console.log("🎙️ Recording started.");
       setIsLoading(false);
     } catch (err) {
-      console.error("Error accessing mic:", err);
+      console.error("🎤 Error accessing microphone:", err);
       setIsLoading(false);
     }
   };

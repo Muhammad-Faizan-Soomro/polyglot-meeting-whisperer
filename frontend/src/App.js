@@ -6,8 +6,15 @@ import TranscriptCard from "./components/TranscriptCard";
 import SettingsModal from "./components/SettingsModal";
 import AgentCard from "./components/AgentCard";
 import useAudioRecording from "./hooks/useAudioRecording";
-import { translate, getLanguageOptions } from "./utils/translator";
+import { getLanguageOptions } from "./utils/translator";
 import "./App.css";
+
+// Reusable Components
+import QuestionCard from "./components/QuestionCard";
+import SummaryCard from "./components/SummaryCard.js";
+import TopicCard from "./components/TopicCard";
+import KeywordCard from "./components/KeywordCard";
+import TranslatedCard from "./components/TranslatedCard";
 
 const App = () => {
   const [transcript, setTranscript] = useState([]);
@@ -21,19 +28,46 @@ const App = () => {
   const [selectedTranslatedLang, setSelectedTranslatedLang] =
     useState("spanish");
 
+  const [questions, setQuestions] = useState([]);
+  const [summary, setSummary] = useState("");
+  const [topics, setTopics] = useState([]);
+  const [keywords, setKeywords] = useState([]);
+
   const { isRecording, isLoading, toggleRecording } = useAudioRecording({
+    language,
+    onSessionStart: () => setSessionStart(Date.now()),
+
     onTranscriptUpdate: (newData) => {
       setTranscript((prev) => [...prev, ...newData]);
+    },
+
+    onTranslatedUpdate: (text) => {
       setTranslatedTranscript((prev) => [
         ...prev,
-        ...newData.map((line) => ({
-          ...line,
-          text: translate(line.text, language),
-        })),
+        {
+          speaker: "",
+          text,
+          time: new Date().toLocaleTimeString(),
+        },
       ]);
     },
-    onSessionStart: () => setSessionStart(Date.now()),
-    language, // <-- add this
+
+    onSummaryUpdate: (cleanSummary, topic) => {
+
+      // 📝 Set summary
+      setSummary(cleanSummary);
+
+      // 🏷️ Append topic only if new
+      setTopics((prev) => [...prev, topic]);
+    },
+
+    onQuestionsUpdate: (incomingQuestions) => {
+      setQuestions((prev) => [...prev, ...incomingQuestions]); // ✅ Append questions
+    },
+
+    onKeywordsUpdate: (incomingKeywords) => {
+      setKeywords((prev) => [...prev, ...incomingKeywords]); // ✅ Append keywords
+    },
   });
 
   useEffect(() => {
@@ -53,7 +87,7 @@ const App = () => {
     return () => clearInterval(timer);
   }, [sessionStart]);
 
-  const summary = {
+  const summaryStats = {
     wordCount: transcript.reduce(
       (acc, curr) => acc + curr.text.split(" ").length,
       0
@@ -68,6 +102,10 @@ const App = () => {
   const resetTranscript = () => {
     setTranscript([]);
     setTranslatedTranscript([]);
+    setQuestions([]);
+    setSummary("");
+    setTopics([]);
+    setKeywords([]);
     setSessionStart(null);
     setSessionDuration("00:00");
   };
@@ -77,10 +115,14 @@ const App = () => {
       session: {
         duration: sessionDuration,
         timestamp: new Date().toISOString(),
-        summary,
+        summary: summaryStats,
       },
       original: transcript,
       translated: translatedTranscript,
+      questions,
+      summary,
+      topics,
+      keywords,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
@@ -170,32 +212,27 @@ const App = () => {
           exportData={handleExport}
         />
         <StatsPanel
-          wordCount={summary.wordCount}
-          speakerCount={summary.speakers}
-          avgWords={summary.avgWords}
+          wordCount={summaryStats.wordCount}
+          speakerCount={summaryStats.speakers}
+          avgWords={summaryStats.avgWords}
           sessionDuration={sessionDuration}
         />
         <div className="grid grid-cols-2 gap-6 mb-6">
-          <TranscriptCard
-            title="Original Transcript"
-            icon="📝"
-            transcript={transcript}
-            isLoading={isLoading}
-            languageOptions={languageOptions}
-            selectedLanguage={selectedOriginalLang}
-            onLanguageChange={setSelectedOriginalLang}
-            showAutoDetect={true}
-          />
-          <TranscriptCard
-            title="Translated Output"
-            icon="🌐"
+          <TranscriptCard transcript={transcript} isLoading={isLoading} />
+          <TranslatedCard
             transcript={translatedTranscript}
             isLoading={isLoading}
-            languageOptions={languageOptions}
-            selectedLanguage={selectedTranslatedLang}
-            onLanguageChange={setSelectedTranslatedLang}
           />
         </div>
+        <div className="grid grid-cols-2 gap-6 mb-6">
+          <QuestionCard questions={questions} isLoading={isLoading} />
+          <SummaryCard summary={summary} isLoading={isLoading} />
+        </div>
+        <div className="grid grid-cols-2 gap-6 mb-6">
+          <TopicCard topics={topics} isLoading={isLoading} />
+          <KeywordCard keywords={keywords} isLoading={isLoading} />
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {agents.map((agent, index) => (
             <AgentCard key={index} {...agent} />
