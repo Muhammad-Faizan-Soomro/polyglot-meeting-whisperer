@@ -14,19 +14,32 @@ class QuestionGeneratorAgent:
         self.client = Groq(api_key=self.api_key)
         self.model_name = model_name
 
-    def run(self, summary: str) -> list:
+    def run(self, summary: str, target_language: str = "English") -> list:
         """
         Generate 3 insightful questions from a given summary paragraph.
         Returns a list of questions.
         """
         try:
             prompt = (
-                f"""You are a helpful assistant. Given the following meeting summary,
-                generate 3 insightful, thought-provoking questions that someone might ask
-                to explore the topic further or assess understanding.\n\n
-                SUMMARY:\n{summary}\n\n
-                Make sure questions are in both languages as summary. RETURN ONLY QUESTIONS.
-                QUESTIONS:"""
+                    f"""You are a thoughtful and intelligent assistant. Based on the meeting summary provided below,
+                    generate 3 insightful and thought-provoking questions. These questions should either encourage deeper reflection
+                    on the topic or help assess someone's understanding of the discussion.
+
+                    SUMMARY:
+                    {summary}
+
+                    The questions should be written in the same language used in the original summary (detect from original summary content).
+                    After each question, provide its {target_language} translation.
+
+                    Format strictly like this:
+                    1. [Question in **original summary language**] ({target_language} translation)
+                    2. ...
+
+                    If the target language is English, then repeat the same question inside parentheses.
+
+                    Only return the numbered list of questions, nothing else.
+
+                    QUESTIONS:"""
             )
 
             print("🤖 Generating questions from summary...")
