@@ -7,11 +7,12 @@
 ```bash
 .
 ├── backend/
-|   ├── index.html
+│   ├── index.html
 │   ├── websocket_server.py
 │   └── agents/
 │       ├── transcribe_agent.py
 │       ├── translate_agent.py
+        ├── keyword_explainer_agent.py
 │       ├── summarizer_agent.py
 │       └── question_generator_agent.py
 ```
@@ -28,7 +29,8 @@ Main server that:
   - 🌍 **TranslateAgent**
   - 📚 **SummarizerAgent**
   - ❓ **QuestionGeneratorAgent**
-- Saves transcripts and translations to `transcripts.txt`
+  - 🧠 **KeywordExplanationAgent**
+- Saves transcripts, translations and keywords explanation to `transcripts.txt`
 - Saves summaries to `summary.txt`
 - Saves questions to `questions.txt`
 
@@ -50,6 +52,10 @@ All agents use Groq API and are located in `backend/agents/`
 - Buffers transcripts in groups (e.g., 6 chunks = summary of pas 30 seconds)
 - Summarizes content using Groq LLM
 - Return summaries in both languages ( original + user-comfortable )
+
+### `keyword_explainer_agent.py`
+- Detects buzzwords or technical terms in the transcript and explains them in 1–2 simple lines.
+- Appended to transcripts.txt after each chunk.
 
 ### `question_generator_agent.py`
 - Generates insightful questions based on summaries
@@ -74,7 +80,7 @@ Access at:
 `http://localhost:8000/`
 
 ## 🗂 Output Files
-- `transcripts.txt`: Chunk-by-chunk transcripts and translations
+- `transcripts.txt`: Chunk-by-chunk transcripts, translations and keyword explanation
 - `summary.txt`: Summaries
 - `questions.txt`: Generated questions
 
