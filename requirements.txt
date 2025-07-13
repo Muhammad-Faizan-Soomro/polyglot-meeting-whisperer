@@ -1,5 +1,0 @@
-websockets
-numpy
-groq
-sounddevice
-python-dotenv
