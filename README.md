@@ -61,21 +61,19 @@ Generate or copy your JWT token from your AgentOS profile.
 🧩 Step 2: Configure Your Summary Q&A Agent
 Open the file:
 
-'''
-swift
+```swift
 Copy
 Edit
 genai-agentos/cli/agents/summary_qa_agent/summary_qa_agent.py
-'''
+```
 
 Paste your JWT token into the AGENT_JWT field:
 
-'''
-python
+```python
 Copy
 Edit
 AGENT_JWT = "your_generated_token_here"
-'''
+```
 
 🧪 Step 3: Ask Questions via GenAI AgentOS UI
 Once the agent is running (python summary_qa_agent.py), it will appear in your GenAI AgentOS UI.
