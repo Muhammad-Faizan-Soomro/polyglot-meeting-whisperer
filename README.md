@@ -196,9 +196,17 @@ You can now use the microphone to record a meeting snippet and see the agent orc
 
 We are a passionate team dedicated to pushing the boundaries of what's possible with Generative AI and multi-agent systems.
 
--   **Abbas Al-Kaisi** | AI Solutions Architect & DevOps Master | [LinkedIn](https://www.linkedin.com/in/abbas-k-a46a362/)
--   **Muhammad Faizan Soomro** | Software Engineer | [LinkedIn](https://www.linkedin.com/in/muhammad-faizan-soomro-49774a229/)
--   **Zizo The Agent** | Lead Technical Advisor
+| Name                   | Role               |
+|------------------------|--------------------|
+| Abbas Al-Kaisi         | AI + Tech Lead |
+| Gabriel Calderon       | Project Lead       |
+| Wajeeha Ghazi          | UI-UX Designer     |
+| Khadeeja               | Documentation Lead |
+| Muhammad Faizan Soomro | Full Stack + AI Lead |
+| Muhammad Jasim         | AI Specialist      |
+| Muhammad Abdullah Bilal| Frontend Developer |
+| Fawad Malik            | AI Specialist      |
+
 
 ---
 
@@ -211,20 +219,6 @@ This project is just the beginning. Our vision for the Agentic Edition includes:
 -   **Dynamic Agent Scaling:** Automatically scaling agents based on workload.
 
 We believe the future of software is **collaborative, intelligent, and agent-driven**. Join us on this exciting journey!
-
----
-
-## 👥 Team Members
-| Name                   | Role               |
-|------------------------|--------------------|
-| Abbas Al-Kaisi         | AI + Full Stack Lead |
-| Gabriel Calderon       | Project Lead       |
-| Wajeeha Ghazi          | UI-UX Designer     |
-| Khadeeja               | Documentation Lead |
-| Muhammad Faizan Soomro | Full Stack + AI Lead |
-| Muhammad Jasim         | AI Specialist      |
-| Muhammad Abdullah Bilal| Frontend Developer |
-| Fawad Malik            | AI Specialist      |
 
 ---
 
