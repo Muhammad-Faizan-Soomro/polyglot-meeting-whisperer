@@ -1,60 +1,114 @@
+# filename: app.py (The FINAL, working version)
+
 import os
 import gradio as gr
 import numpy as np
-import websocket
 import json
-import time
 from dotenv import load_dotenv
+import websockets  
+import asyncio      
 
-# Load environment variables
+
 load_dotenv()
+WEBSOCKET_URL = os.getenv("BACKEND_WEBSOCKET_URL", "ws://localhost:8008/ws")
 
-# WebSocket connection URL - configurable
-WEBSOCKET_URL = os.getenv("WEBSOCKET_URL", "ws://localhost:8008/ws")
 
-def process_audio(audio):
-    """Process audio data and send to backend"""
+async def run_full_process(audio):
+    """
+    This function now connects to our FastAPI backend (main.py) via WebSocket,
+    sends the audio, and waits for the final results.
+    """
     if audio is None:
-        return "No audio detected", "", "", ""
-    
+        return "Please record audio first.", "", "", ""    
     try:
-        # Extract audio data
         sample_rate, audio_np = audio
-        
-        # Log the audio data for debugging
-        print(f"Received audio: sample_rate={sample_rate}, shape={audio_np.shape}")
-        
-        # Simulate processing - in a real implementation, this would send to backend
-        # We're avoiding WebSocket for now to isolate the recording stop issue
-        time.sleep(1)  # Simulate processing time
-        
-        return "Audio processed successfully", "Transcript placeholder", "Translations placeholder", "Summary placeholder"
-        
+        print(f"Gradio: Received audio, preparing to send to backend at {WEBSOCKET_URL}")
+
+        audio_hex = audio_np.astype(np.float32).tobytes().hex()
+
+        message_to_send = json.dumps({
+            "type": "process_audio",
+            "audio_data": audio_hex,
+            "sample_rate": sample_rate,
+            "languages": ["Chinese", "French", "Arabic"] 
+        })
+
+        async with websockets.connect(WEBSOCKET_URL) as websocket:
+            print("Gradio: Connected to backend. Sending audio data...")
+            await websocket.send(message_to_send)
+            
+            status = "Sent. Waiting for response..."
+            transcript = "Processing..."
+            translations = "Processing..."
+            summary = "Processing..."
+
+            while True:
+                try:
+                    response_str = await asyncio.wait_for(websocket.recv(), timeout=60.0)
+                    response = json.loads(response_str)
+                    response_type = response.get("type")                    
+                    print(f"Gradio: Received message from backend -> Type: {response_type}")
+                    if response_type == "status":
+                        status = response.get("message", status)
+                    elif response_type == "transcript":
+                        transcript = response.get("text", transcript)
+                    elif response_type == "final_result":
+                        final_data = response.get("data", {})
+                        summary = final_data.get("summary", "No summary found.")
+                        translations_obj = final_data.get("translations", {})
+                        translations = "\n".join([f"{lang}: {text}" for lang, text in translations_obj.items()])
+                        # questions = final_data.get("questions", "No questions found.")
+                        
+                        status = "Done! All results received."
+                        break
+                    elif response_type == "error":
+                        status = f"Error: {response.get('message')}"
+                        break 
+
+                except asyncio.TimeoutError:
+                    status = "Connection timed out. Did the backend process take too long?"
+                    break
+                except websockets.exceptions.ConnectionClosed:
+                    status = "Connection with backend was closed."
+                    break
+            
+            return status, transcript, translations, summary
+
     except Exception as e:
-        print(f"Error processing audio: {str(e)}")
-        return f"Error: {str(e)}", "", "", ""
+        error_message = f"Critical error in Gradio interface: {str(e)}"
+        print(error_message)
+        return error_message, "", "", ""
+
 
 def simple_interface():
-    """Create a very simple interface with minimal functionality"""
-    with gr.Blocks() as interface:
+    with gr.Blocks(title="Polyglot Meeting Whisperer") as interface:
         gr.Markdown("# Polyglot Meeting Whisperer")
-        gr.Markdown("Record audio to test the interface.")
+        gr.Markdown("Record your meeting snippet, and let the agent orchestra do the work!")
         
-        audio_input = gr.Audio(sources=["microphone"], type="numpy", label="Record Audio")
-        status = gr.Textbox(label="Status", value="Ready to record")
-        transcript = gr.Textbox(label="Original Transcript", value="")
-        translations = gr.Textbox(label="Translations", value="")
-        summary = gr.Textbox(label="Summary", value="")
+        with gr.Row():
+            audio_input = gr.Audio(sources=["microphone"], type="numpy", label="Record Audio Here")
         
-        # Handle audio submission
-        audio_input.change(
-            fn=process_audio,
+        with gr.Row():
+            status = gr.Textbox(label="Status", value="Ready to record...", interactive=False)
+        
+        with gr.Row():
+            transcript = gr.Textbox(label="Original Transcript", lines=5, interactive=False)
+        
+        with gr.Row():
+            translations = gr.Textbox(label="Summary Translations", lines=5, interactive=False)
+            summary = gr.Textbox(label="Key-Point Summary", lines=5, interactive=False)
+        
+        audio_input.stop_recording(
+            fn=run_full_process, 
             inputs=[audio_input],
             outputs=[status, transcript, translations, summary]
         )
     
     return interface
 
+
 if __name__ == "__main__":
+    # pip install websockets
     app = simple_interface()
-    app.launch(server_name="0.0.0.0", server_port=7860, share=False)
+    # share=True 
+    app.launch(server_name="0.0.0.0", server_port=7860, share=True)
