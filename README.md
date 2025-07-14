@@ -50,11 +50,10 @@ polyglot-meeting-whisperer/
 - Python 3.8+ (backend)
 - Groq API key (backend)
 
-🧠 Using GenAI AgentOS with This Project
+### 🧠 Using GenAI AgentOS with This Project
 To enable agent-based querying of the meeting summary using GenAI AgentOS, follow these steps:
 
-🔐 Step 1: Authenticate with GenAI AgentOS
-Log in at: https://console.genai.works
+🔐 Step 1: Authenticate with GenAI AgentOS and Log in
 
 Generate or copy your JWT token from your AgentOS profile.
 
