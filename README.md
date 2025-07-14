@@ -1,4 +1,4 @@
-# Polyglot Meeting Whisperer (Agentic Edition) 🚀
+# Polyglot Meeting Whisperer (GenAIOS Protocol Edition) 🚀
 
 Welcome to the **Agentic Edition** of the Polyglot Meeting Whisperer! This version represents a fundamental architectural evolution of the original concept, moving from a monolithic application to a powerful, orchestrated ecosystem of specialized AI Agents built on the **GenAIOS Protocol**.
 
@@ -17,7 +17,14 @@ This special **Agentic Edition** takes this vision a step further. Instead of on
 
 Our system employs a sophisticated, multi-agent architecture where tasks are decoupled and handled by specialized agents. The user interacts with a Gradio UI, which communicates via WebSocket to our backend. The backend, in turn, orchestrates a flow of tasks delegated to the GenAIOS agent ecosystem.
 
+</br>
+</br>
+
+
 **Sequence Diagram:**
+</br>
+This code accurately represents the time-based interaction between the user, the UI, your backend, and the GenAIOS ecosystem.
+
 ```mermaid
 sequenceDiagram
     participant User
@@ -53,7 +60,11 @@ sequenceDiagram
     Client-->>UI: Update UI with All Results
 ```
 
+</br>
 **Agent Flow Diagram:**
+</br>
+This code represents the internal logic and data flow between the different agents as orchestrated by the OutputOrchestratorAgent.
+
 ```mermaid
 flowchart TD
     A["Frontend WebSocket Client"] -- Audio Data --> B(["AudioStreamProcessorAgent"])
@@ -89,7 +100,7 @@ flowchart TD
     style K fill:#C8E6C9
 ```
 
----
+</br>
 
 ## 🛠️ Project Structure
 
