@@ -20,7 +20,7 @@ if not GROQ_API_KEY:
 client = Groq(api_key=GROQ_API_KEY)
 
 
-AGENT_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNDM4NDhmZS1lOGJmLTRiODUtYWQwMy1iMzBmMDdiMWY3YTciLCJleHAiOjI1MzQwMjMwMDc5OSwidXNlcl9pZCI6IjUwYzQ4Y2VhLWMxNDktNGUzMS04MDc2LTNmOTkyYjUyOTA5NiJ9.d3WjB1zbhmACYq24AliUV4w5fnQ_uvKF4mDvDMFt-k0" # noqa: E501
+AGENT_JWT = ""
 session = GenAISession(jwt_token=AGENT_JWT)
 
 # ✅ Helper: Load the summary
